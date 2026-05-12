@@ -226,7 +226,7 @@ class MicropolisEnv(core.Env):
         self.micro.close()
 
     def randomStaticStart(self):
-        num_static = self.MAP_X * self.MAP_Y / 10
+        num_static = int(self.MAP_X * self.MAP_Y / 10)
         lst_epi = 500
 #       num_static = math.ceil(((lst_epi - self.num_episode) / lst_epi) * num_static)
 #       num_static = max(0, max_static)
