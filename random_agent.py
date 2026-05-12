@@ -211,7 +211,7 @@ def main():
             
             step += 1
 
-            print(env.zone_grid_to_text(False))
+            print(env.get_map_ascii(False))
             
             # Check if episode is done
             if done:
