@@ -63,11 +63,13 @@
 
 
 PYTHON = python3
-SWIG = swig3.0
+SWIG = swig
 
 PYTHONBUILDDIR = $(shell python3 -c 'from distutils import sysconfig, util ; \
-	print("lib.%s-%s" \
-		% (util.get_platform(), sysconfig.get_config_var("VERSION")))')
+	print("lib.%s-cpython-%s%s" \
+		% (util.get_platform(), \
+		   sysconfig.get_config_var("py_version_nodot"), \
+		   sysconfig.get_config_var("ABIFLAGS") or ""))')
 
 SOURCES = \
 	src/allocate.cpp \
@@ -131,8 +133,11 @@ objs/$(PYTHONBUILDDIR)/_micropolisengine.so: build_swig setup.py $(SOURCES) $(HE
 
 build_swig: objs/micropolisengine_wrap.cpp
 
-objs/micropolisengine_wrap.cpp: swig/micropolisengine.i swig/micropolisengine-swig-python.i $(HEADERS)
-	$(SWIG) -python -py3 -c++ -Isrc -Wall \
+objs:
+	mkdir -p objs
+
+objs/micropolisengine_wrap.cpp: swig/micropolisengine.i swig/micropolisengine-swig-python.i $(HEADERS) | objs
+	$(SWIG) -python -c++ -Isrc -Wall \
 	        -outdir objs \
 		-o objs/micropolisengine_wrap.cpp \
 		swig/micropolisengine.i
@@ -149,7 +154,7 @@ cleanswig: clean
 	rm -rf python/micropolisengine.py python/micropolisengine_wrap.cpp
 
 install: all
-	($(PYTHON) setup.py install)
+	echo "Skipping system install - using build artifacts"
 
 #
 # NOTE: Dependencies below are not used (since Python distutils is building

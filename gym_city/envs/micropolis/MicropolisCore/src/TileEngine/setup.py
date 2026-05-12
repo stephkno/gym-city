@@ -88,14 +88,17 @@ setup(
                 '/usr/include/pycairo',
                 '/opt/local/include/cairo',
                 '/opt/local/include/pycairo',
+                '/usr/lib/python3/dist-packages/cairo/include',
             ],
             library_dirs = [
                 '/opt/gtk/lib',
                 '/opt/local/lib',
+                '/usr/lib/python3/dist-packages/cairo',
             ],
             libraries = [
                 'cairo',
-            ]),
+            ],
+            define_macros = [('PYCAIRO_NO_IMPORT', None)],),
     ]
 )
 

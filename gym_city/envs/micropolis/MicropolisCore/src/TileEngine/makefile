@@ -64,7 +64,7 @@
 
 
 PYTHON ?= python3
-SWIG = swig3.0
+SWIG = swig
 
 PYTHONBUILDDIR=$(shell $(PYTHON) -c 'from distutils import sysconfig, util ; \
     print("lib.%s-%s" \
@@ -109,9 +109,11 @@ objs/$(PYTHONBUILDDIR)/_tileengine.so: build_swig setup.py $(SOURCES) $(HEADERS)
 
 build_swig: objs/tileengine_wrap.cpp
 
+objs:
+	mkdir -p objs
 
-objs/tileengine_wrap.cpp: swig/tileengine.i swig/tileengine-swig-python.i swig/pycairo.i $(HEADERS)
-	$(SWIG) -python -py3 -c++ -Isrc -Wall \
+objs/tileengine_wrap.cpp: swig/tileengine.i swig/tileengine-swig-python.i swig/pycairo.i $(HEADERS) | objs
+	$(SWIG) -python -c++ -Isrc -Wall \
 	        -outdir objs \
 	        -o objs/tileengine_wrap.cpp \
 	        swig/tileengine.i
@@ -124,7 +126,7 @@ clean:
 	rm -rf python/*~ python/*.pyc python/*.pyd
 
 install: all
-	($(PYTHON) setup.py install)
+	echo "Skipping system install - using build artifacts"
 
 
 ########################################################################

@@ -63,8 +63,10 @@
 
 PYTHON ?= python3
 PYTHONBUILDDIR=$(shell $(PYTHON) -c 'from distutils import sysconfig, util ; \
-    print("lib.%s-%s" \
-        % (util.get_platform(), sysconfig.get_config_var("VERSION")))')
+    print("lib.%s-cpython-%s%s" \
+        % (util.get_platform(), \
+           sysconfig.get_config_var("py_version_nodot"), \
+           sysconfig.get_config_var("ABIFLAGS") or ""))')
 
 
 # PYTHONBUILDDIR=$(shell python3 -c 'from distutils import sysconfig, util ; \
@@ -109,7 +111,7 @@ TILEENGINEDEST = pyMicropolis/tileEngine
 build_tileEngine:
 	$(MAKE) -C TileEngine build_python
 	cp TileEngine/objs/tileengine.py $(TILEENGINEDEST)
-	cp TileEngine/objs/$(PYTHONBUILDDIR)/_tileengine.cpython-36m-x86_64-linux-gnu.so $(TILEENGINEDEST)
+	cp TileEngine/objs/$(PYTHONBUILDDIR)/_tileengine*.so $(TILEENGINEDEST)
 
 # ----------------------------------------------------------------------
 # build/install cellEngine
@@ -119,7 +121,7 @@ CELLENGINEDEST = pyMicropolis/cellEngine
 build_cellEngine:
 	$(MAKE) -C CellEngine build_python
 	cp CellEngine/objs/cellengine.py $(CELLENGINEDEST)
-	cp CellEngine/objs/$(PYTHONBUILDDIR)/_cellengine.cpython-36m-x86_64-linux-gnu.so $(CELLENGINEDEST)
+	cp CellEngine/objs/$(PYTHONBUILDDIR)/_cellengine*.so $(CELLENGINEDEST)
 
 # ----------------------------------------------------------------------
 # build/install micropolisEngine
@@ -129,6 +131,6 @@ MICROPOLISENGINEDEST = pyMicropolis/micropolisEngine
 build_micropolisEngine:
 	$(MAKE) -C MicropolisEngine build_python
 	cp MicropolisEngine/objs/micropolisengine.py $(MICROPOLISENGINEDEST)
-	cp MicropolisEngine/objs/$(PYTHONBUILDDIR)/_micropolisengine.cpython-36m-x86_64-linux-gnu.so $(MICROPOLISENGINEDEST)
+	cp MicropolisEngine/objs/$(PYTHONBUILDDIR)/_micropolisengine*.so $(MICROPOLISENGINEDEST)
 
 ########################################################################

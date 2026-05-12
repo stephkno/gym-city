@@ -556,6 +556,73 @@ class MicropolisEnv(core.Env):
            #print(self.micro.map.centers)
 
 
+    def describe_city(self, verbose=False):
+        '''
+        Returns a plain text description of the current city state.
+        
+        Args:
+            verbose: If True, includes more detailed information including
+                    zone counts and density statistics
+        
+        Returns:
+            str: A human-readable description of the city state
+        '''
+        # Get basic metrics
+        res_pop = self.micro.getResPop()
+        com_pop = self.micro.getComPop()
+        ind_pop = self.micro.getIndPop()
+        total_pop = res_pop + com_pop + ind_pop
+        traffic = self.micro.total_traffic
+        funds = self.micro.getFunds()
+        mayor_rating = self.getRating()
+        num_plants = self.micro.map.num_plants
+        
+        # Get zone counts
+        zone_map = self.micro.map.zoneMap[-1]  # Shape: (MAP_X, MAP_Y)
+        zone_counts = {}
+        for zone_name, zone_int in self.micro.map.zoneInts.items():
+            count = np.sum(zone_map == zone_int)
+            if count > 0:
+                zone_counts[zone_name] = int(count)
+        
+        # Build description
+        lines = []
+        lines.append("=" * 60)
+        lines.append("CITY STATE DESCRIPTION")
+        lines.append("=" * 60)
+        lines.append(f"")
+        lines.append("POPULATION:")
+        lines.append(f"  Total: {total_pop:,}")
+        lines.append(f"  Residential: {res_pop:,}")
+        lines.append(f"  Commercial: {com_pop:,}")
+        lines.append(f"  Industrial: {ind_pop:,}")
+        lines.append(f"")
+        lines.append("INFRASTRUCTURE:")
+        lines.append(f"  Traffic: {traffic:,}")
+        lines.append(f"  Power Plants: {num_plants}")
+        lines.append(f"  Funds: ${funds:,}")
+        lines.append(f"  Mayor Rating: {mayor_rating}/100")
+        lines.append(f"")
+        lines.append("ZONE DISTRIBUTION:")
+        for zone_name, count in sorted(zone_counts.items(), key=lambda x: -x[1]):
+            percentage = (count / (self.MAP_X * self.MAP_Y)) * 100
+            lines.append(f"  {zone_name}: {count} tiles ({percentage:.1f}%)")
+        
+        if verbose:
+            lines.append(f"")
+            lines.append("METRICS:")
+            lines.append(f"  Step: {self.num_step}")
+            lines.append(f"  Episode: {self.num_episode}")
+            lines.append(f"  Current Reward: {self.curr_reward:.2f}")
+            lines.append(f"  City Time: {self.micro.engine.cityTime} ticks")
+            lines.append(f"  City Month: {self.micro.engine.cityMonth}")
+            lines.append(f"  Year: {(self.micro.engine.cityTime // 48) + 1900}")
+        
+        lines.append("=" * 60)
+        
+        return "\n".join(lines)
+
+
     def render(self, mode='human'):
         self.micro.render()
 

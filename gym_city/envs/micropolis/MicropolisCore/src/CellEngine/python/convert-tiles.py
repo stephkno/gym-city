@@ -85,17 +85,17 @@ def ChopTiles(fileName, newFileName, oldcols, newcols):
     global im, newim
     im = Image.open(fileName)
     width, height = im.size
-    print(("NEWCOLS", newcols))
-    print(("WIDTH", width, "HEIGHT", height))
+    print("NEWCOLS", newcols)
+    print("WIDTH", width, "HEIGHT", height)
     cols = 1
     rows = height / width
-    print((fileName, width, height, im))
+    print(fileName, width, height, im)
 
     newwidth = width * newcols
     newheight = int(math.ceil(height / newcols))
     newrows = newheight / width
 
-    print(("NEWWIDTH", newwidth, "NEWHEIGHT", newheight, "NEWCOLS", newcols, "NEWROWS", newrows))
+    print("NEWWIDTH", newwidth, "NEWHEIGHT", newheight, "NEWCOLS", newcols, "NEWROWS", newrows)
 
     newim = Image.new(im.mode, (newwidth, newheight))
 

@@ -403,7 +403,7 @@ class CamDrawingArea(gtk.DrawingArea):
         self.cellCols = cols
         self.cellRows = rows
 
-        print(("COLS", cols, "ROWS", rows, "NEIGHBORHOOD", neighborhood, "NAME", name))
+        print("COLS", cols, "ROWS", rows, "NEIGHBORHOOD", neighborhood, "NAME", name)
         
         self.e = Engine(
             cols,
@@ -429,7 +429,7 @@ class CamDrawingArea(gtk.DrawingArea):
                 for col in range(0, len(rowLine)):
                     ch = rowLine[col : col + 1]
                     if ch not in CharToCode:
-                        print(("Unknown char: ", ch))
+                        print("Unknown char: ", ch)
                     else:
                         code = CharToCode[ch]
                         #print row, col, code
@@ -833,12 +833,12 @@ class CamDrawingArea(gtk.DrawingArea):
 
         cellName = CodeToName.get(cellCode, None)
         if not cellName:
-            print(("Unknown cell code:", cellCode))
+            print("Unknown cell code:", cellCode)
             return
 
         cellDescription = NameToDescription.get(cellName, None)
         if not cellDescription:
-            print(("Unknown cell name:", cellName, "code", cellCode))
+            print("Unknown cell name:", cellName, "code", cellCode)
             return
 
         #print hex(cellCode), cellName, cellDescription
@@ -994,7 +994,7 @@ class CamDrawingArea(gtk.DrawingArea):
         elif key == 65363:
             self.moveCursor(1, 0)
         else:
-            print(("KEY", event.keyval))
+            print("KEY", event.keyval)
 
 
     def handle_motion_notify(self, widget, event):

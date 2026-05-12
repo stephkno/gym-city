@@ -135,3 +135,47 @@
 
 
 ////////////////////////////////////////////////////////////////////////
+// Define and Initialize PyCairo C API
+// Note: When PYCAIRO_NO_IMPORT is defined (in tileengine.h), Pycairo_CAPI
+// is extern. We need to define it here AND initialize it.
+
+%{
+/* Undefine PYCAIRO_NO_IMPORT to get Pycairo_CAPI definition */
+#ifdef PYCAIRO_NO_IMPORT
+#undef PYCAIRO_NO_IMPORT
+#endif
+
+/* Include py3cairo.h to get Pycairo_CAPI definition */
+#include "/usr/lib/python3/dist-packages/cairo/include/py3cairo.h"
+
+/* Re-define PYCAIRO_NO_IMPORT for other includes */
+#define PYCAIRO_NO_IMPORT
+
+/* Define Pycairo_CAPI - this will be used by the generated code */
+/* Note: py3cairo.h defines Pycairo_CAPI as a static variable when
+ * PYCAIRO_NO_IMPORT is NOT defined. We need it to be a proper symbol
+ * in our .so file, so we define it here after the header. */
+/* But wait - it's already defined by the header! We just need to ensure
+ * it's not static. Let's check... */
+%}
+
+/* Force Pycairo_CAPI to be a global symbol */
+/* We use %inline to ensure the definition is visible */
+
+%inline %{
+/* This should not be needed since py3cairo.h already defines it */
+/* But let's make sure it's defined correctly */
+%}
+
+%init
+%{
+    /* Import the PyCairo C API from the cairo module's capsule */
+    Pycairo_CAPI = (Pycairo_CAPI_t*) PyCapsule_Import("cairo.CAPI", 0);
+    if (Pycairo_CAPI == NULL) {
+        PyErr_SetString(PyExc_ImportError, "Failed to import PyCairo C API");
+        return NULL;
+    }
+%}
+
+
+////////////////////////////////////////////////////////////////////////

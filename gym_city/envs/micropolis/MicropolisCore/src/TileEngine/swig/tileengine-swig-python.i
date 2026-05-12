@@ -83,30 +83,9 @@
 
 
 ////////////////////////////////////////////////////////////////////////
-// Globals
-
-
-extern Pycairo_CAPI_t *Pycairo_CAPI;
-
-
-////////////////////////////////////////////////////////////////////////
+// SWIG will handle pycairo CAPI initialization automatically
 
 %}
 
 
-////////////////////////////////////////////////////////////////////////
-// Initialization code for generated file SWIG_init.
 
-
-%init %{
-
-    // SWIG init code from tileengine-swig-python.i.
-
-    // Import the pycairo module's functions and types into this module. 
-    // This enables us to convert between cairo_t and Python cairo.Context objects.
-    Pycairo_CAPI;
-
-%}
-
-
-////////////////////////////////////////////////////////////////////////

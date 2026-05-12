@@ -102,6 +102,8 @@
 #include <vector>
 #include <map>
 
+/* Define PYCAIRO_NO_IMPORT - we'll manually define Pycairo_CAPI in the SWIG module */
+#define PYCAIRO_NO_IMPORT
 #include <cairo.h>
 #include <py3cairo.h>
 

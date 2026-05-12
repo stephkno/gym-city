@@ -1,0 +1,58 @@
+import sys
+import os
+
+# Require GTK 3.0 FIRST
+import gi
+gi.require_version('Gtk', '3.0')
+
+# Import GTK FIRST before any gym-city modules
+from gi.repository import Gtk as gtk
+
+# Add the micropolis core to path directly
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'gym_city/envs/micropolis/MicropolisCore/src'))
+
+from pyMicropolis.gtkFrontend import main
+
+class SimpleEnv:
+    def __init__(self):
+        self.micro = None
+
+env = SimpleEnv()
+engine, win1 = main.train(env=env, rank=None, map_x=50, map_y=50, gui=True)
+
+print(f"Initial cityTime: {engine.cityTime}")
+print(f"Timer active: {engine.timerActive}")
+print(f"Engine running: {engine.running}")
+print(f"Engine paused: {engine.simPaused}")
+
+# Step 1: Resume the engine (it starts paused)
+engine.resume()
+
+# Step 2: Stop the automatic timer that advances time based on real time
+engine.timerActive = False
+
+print(f"\nAfter setup:")
+print(f"Timer active: {engine.timerActive}")
+print(f"Engine running: {engine.running}")
+print(f"Engine paused: {engine.simPaused}")
+
+def render_no_timeAdvance(engine):
+    """Render without advancing time by ensuring timer is stopped"""
+    # Process GTK events - since timer is stopped, no time advancement occurs
+    while gtk.events_pending():
+        gtk.main_iteration()
+
+i = 0
+# Run for N steps - each step advances exactly 1 tick (1 month)
+while(True):
+    i+=1
+    print(f"\nStep {i}")
+    print(f"  Before: cityTime={engine.cityTime}, cityMonth={engine.cityMonth}, year={(engine.cityTime // 48) + 1900}")
+    
+    # Advance simulation by exactly 1 tick
+    engine.simTick()
+    
+    # Render - just update display without advancing time
+    render_no_timeAdvance(engine)
+    
+    print(f"  After: cityTime={engine.cityTime}, cityMonth={engine.cityMonth}, year={(engine.cityTime // 48) + 1900}")
