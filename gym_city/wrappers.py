@@ -56,8 +56,8 @@ class Extinguisher(gym.Wrapper):
         # assume square map
         print('LOCALWIPE')
         curr_dels = 0
-        x = np.random.randint(0, self.MAP_X)
-        y = np.random.randint(0, self.MAP_Y)
+        x = np.random.integers(0, self.MAP_X)
+        y = np.random.integers(0, self.MAP_Y)
         for r in range(0, max(x, abs(self.MAP_X - x), y, abs(self.MAP_Y - y))):
             curr_dels = self.clear_border(x, y, r, curr_dels)
             if curr_dels >= self.n_dels:

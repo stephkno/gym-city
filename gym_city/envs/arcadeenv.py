@@ -56,8 +56,8 @@ class MicroArcadeEnv(core.Env):
 
 
     def randomStart(self):
-        i = np.random.randint(0, (self.MAP_X * self.MAP_Y))
-        a = (np.random.randint(0, self.num_tools, i), np.random.randint(0, self.MAP_X, i), np.random.randint(0, self.MAP_Y, i))
+        i = int(np.random.integers(0, (self.MAP_X * self.MAP_Y)))
+        a = (np.random.integers(0, self.num_tools, i), np.random.integers(0, self.MAP_X, i), np.random.integers(0, self.MAP_Y, i))
         for j in range(i):
             self.micro.takeSetupAction((a[0][j], a[1][j], a[2][j]))
         for k in range(3):

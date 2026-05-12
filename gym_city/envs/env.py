@@ -254,11 +254,11 @@ class MicropolisEnv(core.Env):
         ''' Set up one plant, one res. If we restrict the agent to building power lines, we can test its ability
         to make long-range associations. '''
         for i in range(5):
-            self.micro.doBotTool(np.random.randint(0, self.micro.MAP_X),
-                                 np.random.randint(0, self.micro.MAP_Y), 'Residential', static_build=True)
+            self.micro.doBotTool(np.random.integers(0, self.micro.MAP_X),
+                                 np.random.integers(0, self.micro.MAP_Y), 'Residential', static_build=True)
         while self.micro.map.num_plants == 0:
-            self.micro.doBotTool(np.random.randint(0, self.micro.MAP_X),
-                                  np.random.randint(0, self.micro.MAP_Y),
+            self.micro.doBotTool(np.random.integers(0, self.micro.MAP_X),
+                                  np.random.integers(0, self.micro.MAP_Y),
                                   'NuclearPowerPlant', static_build=True)
 
     def reset(self):
