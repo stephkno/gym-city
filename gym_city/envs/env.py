@@ -706,6 +706,19 @@ class MicropolisEnv(core.Env):
         
         return "\n".join(lines)
 
+    def pan_map(self, x, y):
+        '''
+        Pans the navigation map view to center on the given tile coordinates.
+        
+        Args:
+            x: Tile X coordinate (0 to MAP_X-1)
+            y: Tile Y coordinate (0 to MAP_Y-1)
+        '''
+        nav_map = self.micro.win1.navigationMapView
+        if nav_map and hasattr(nav_map, 'panTo'):
+            # Pan to the center of the tile (multiply by 16 for pixel coordinates)
+            nav_map.panTo(x * 16, y * 16)
+
     def get_map_ascii(self, include_stats=True):
         '''
         Returns the city map as an ASCII grid with zone abbreviations.
