@@ -22,6 +22,11 @@ runs*
 *.o
 *.so
 
+# SWIG-generated Python files
+**/tileengine.py
+**/micropolisengine.py
+**/cellengine.py
+
 # vim
 *.swp
 
