@@ -556,6 +556,156 @@ class MicropolisEnv(core.Env):
            #print(self.micro.map.centers)
 
 
+    def get_zone_grid(self, abbreviate=True):
+        '''
+        Returns the city zone map as a 2D grid with zone names.
+        
+        Args:
+            abbreviate: If True, uses short names (R, C, I, W, D, etc.)
+                       If False, uses full names (Residential, Commercial, etc.)
+        
+        Returns:
+            List[List[str]]: 2D grid of zone names
+        '''
+        zone_map = self.micro.map.zoneMap[-1]  # Shape: (MAP_X, MAP_Y)
+        zone_map = zone_map.transpose(1, 0)  # Transpose to get (Y, X) order for display
+        
+        # Get zone name mapping
+        zone_names = self.micro.map.zones
+        
+        # Abbreviation mapping for compact display
+        abbreviations = {
+            'Residential': 'R', 'Commercial': 'C', 'Industrial': 'I',
+            'Road': 'D', 'Rail': 'L', 'Wire': 'W', 'Forest': 'F',
+            'Land': 'L', 'Water': 'W', 'Rubble': 'B', 'CoalPowerPlant': 'P',
+            'NuclearPowerPlant': 'N', 'Airport': 'A', 'Seaport': 'S',
+            'Stadium': 'T', 'Park': 'K', 'FireDept': 'Fire', 'PoliceDept': 'Pol',
+            'Net': 'Net', 'Church': 'Ch', 'Hospital': 'H',
+            'RoadWire': 'RW', 'RailWire': 'RW', 'Bridge': 'Br',
+            'RoadRail': 'RL', 'WaterWire': 'WW', 'Radar': 'Rd',
+            'RailBridge': 'RB'
+        }
+        
+        grid = []
+        for y in range(self.MAP_Y):
+            row = []
+            for x in range(self.MAP_X):
+                zone_int = int(zone_map[y, x])
+                if zone_int < len(zone_names):
+                    zone_name = zone_names[zone_int]
+                    if abbreviate and zone_name in abbreviations:
+                        row.append(abbreviations[zone_name])
+                    else:
+                        row.append(zone_name)
+                else:
+                    row.append('U')  # Unknown
+            grid.append(row)
+        return grid
+
+    def zone_grid_to_text(self, abbreviate=True):
+        '''
+        Returns the zone grid as a formatted text string.
+        
+        Args:
+            abbreviate: If True, uses short zone names
+        
+        Returns:
+            str: Formatted text representation of the zone grid
+        '''
+        grid = self.get_zone_grid(abbreviate=abbreviate)
+        
+        # Create column headers
+        header = '   ' + ' '.join(f'{i:2d}' for i in range(self.MAP_X))
+        lines = [header, '   ' + '--' * self.MAP_X]
+        
+        # Add each row with row number
+        for y, row in enumerate(grid):
+            row_str = f'{y:2d}|' + ' '.join(f'{s:>2s}' for s in row)
+            lines.append(row_str)
+        
+        # Add legend for abbreviations
+        if abbreviate:
+            legend = [
+                '',
+                'Legend:',
+                '  R=Residential, C=Commercial, I=Industrial, D=Road,',
+                '  L=Rail, W=Wire, F=Forest, P=Coal Plant, N=Nuclear Plant,',
+                '  A=Airport, S=Seaport, T=Stadium, K=Park, Fire=Fire Dept,',
+                '  Pol=Police Dept, Ch=Church, H=Hospital, U=Unknown'
+            ]
+            lines.extend(legend)
+        
+        return '\n'.join(lines)
+
+    def get_zone_counts(self):
+        '''
+        Returns a dictionary of zone types and their counts.
+        
+        Returns:
+            Dict[str, int]: Zone name to count mapping
+        '''
+        zone_map = self.micro.map.zoneMap[-1]
+        zone_names = self.micro.map.zones
+        counts = {}
+        
+        for zone_int in range(len(zone_names)):
+            count = int(np.sum(zone_map == zone_int))
+            if count > 0:
+                counts[zone_names[zone_int]] = count
+        
+        return counts
+
+    def get_road_networks(self):
+        '''
+        Returns information about connected road networks.
+        
+        Returns:
+            Dict[int, int]: Network ID to size mapping
+        '''
+        return dict(self.micro.map.road_net_sizes)
+
+    def get_road_network_text(self):
+        '''
+        Returns a text description of road networks.
+        
+        Returns:
+            str: Formatted description of road networks
+        '''
+        networks = self.get_road_networks()
+        if not networks:
+            return "No road networks detected."
+        
+        lines = ["ROAD NETWORKS:"]
+        total_road_tiles = 0
+        for net_id, size in sorted(networks.items(), key=lambda x: -x[1]):
+            lines.append(f"  Network {net_id}: {size} tiles")
+            total_road_tiles += size
+        lines.append(f"  Total: {total_road_tiles} road tiles in {len(networks)} network(s)")
+        
+        return "\n".join(lines)
+
+    def get_density_info(self):
+        '''
+        Returns a text description of traffic and population density.
+        
+        Returns:
+            str: Formatted density information
+        '''
+        traffic = self.micro.total_traffic
+        pop = self.micro.getResPop() + self.micro.getComPop() + self.micro.getIndPop()
+        
+        lines = [
+            "DENSITY INFO:",
+            f"  Total Population: {pop:,}",
+            f"  Total Traffic: {traffic:,}",
+        ]
+        
+        if traffic > 0 and pop > 0:
+            traffic_per_capita = traffic / pop
+            lines.append(f"  Traffic per capita: {traffic_per_capita:.2f}")
+        
+        return "\n".join(lines)
+
     def describe_city(self, verbose=False):
         '''
         Returns a plain text description of the current city state.
