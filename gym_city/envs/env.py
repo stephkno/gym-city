@@ -9,11 +9,11 @@ if sys.version_info[0] >= 3:
     import gi
     gi.require_version('Gtk', '3.0')
     from gi.repository import Gtk as gtk
-    from .tilemap import TileMap
+    from .tilemap import TileMap, zoneFromInt
     from .corecontrol import MicropolisControl
 else:
     import gtk
-    from tilemap import TileMap
+    from tilemap import TileMap, zoneFromInt
     from corecontrol import MicropolisControl
 import time
 
@@ -705,6 +705,70 @@ class MicropolisEnv(core.Env):
             lines.append(f"  Traffic per capita: {traffic_per_capita:.2f}")
         
         return "\n".join(lines)
+
+    def get_map_ascii(self, include_stats=True):
+        '''
+        Returns the city map as an ASCII grid with zone abbreviations.
+        This provides tile-level accuracy for LLM spatial awareness.
+        
+        Args:
+            include_stats: If True, adds stats line at top (pop, funds, etc.)
+        
+        Returns:
+            str: Formatted ASCII grid with one character per tile
+        '''
+        # Tile character mapping
+        tile_map = {
+            'Residential': 'R',
+            'Commercial': 'C',
+            'Industrial': 'I',
+            'Road': '+',
+            'Rail': '=',
+            'Wire': 'w',
+            'FireDept': 'F',
+            'PoliceDept': 'P',
+            'CoalPowerPlant': 'E',
+            'NuclearPowerPlant': 'N',
+            'Stadium': 'S',
+            'Airport': 'A',
+            'Seaport': 'H',
+            'Park': 'k',
+            'Water': '~',
+            'Forest': 't',
+            'Land': '.',
+            'Rubble': 'X',
+            'Fire': 'f',
+            'Hospital': 'h',
+            'Church': 'c',
+            'Net': 'n',
+        }
+        
+        rows = []
+        for y in range(self.MAP_Y):
+            row = ''
+            for x in range(self.MAP_X):
+                tile_int = self.micro.getTile(x, y) & 1023
+                zone_name = zoneFromInt(tile_int)
+                char = tile_map.get(zone_name, '?')
+                row += char
+            rows.append(row)
+        
+        result = '\n'.join(rows)
+        
+        if include_stats:
+            # Add stats line at top
+            pop = self.micro.getResPop() + self.micro.getComPop() + self.micro.getIndPop()
+            funds = self.micro.getFunds()
+            traffic = self.micro.total_traffic
+            
+            # Count unpowered zones (zones without power)
+            power_map = self.micro.getDensityMaps()[0]
+            unpowered = int(np.sum(power_map == 0))
+            
+            stats = f"Stats: Pop={pop:,}, Funds=${funds:,}, Traffic={traffic:,}, Unpowered={unpowered}"
+            result = stats + "\n" + result
+        
+        return result
 
     def describe_city(self, verbose=False):
         '''

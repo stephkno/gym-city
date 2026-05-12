@@ -210,6 +210,8 @@ def main():
                     print(f"\nStep {step} (skipping action)")
             
             step += 1
+
+            print(env.zone_grid_to_text(False))
             
             # Check if episode is done
             if done:
@@ -230,7 +232,7 @@ def main():
                 step = 0
                 
                 print(f"Environment reset for new city (Episode {episode})")
-                print_metrics(env, step=0)
+                #print_metrics(env, step=0)
     
     except KeyboardInterrupt:
         print("\n\nInterrupted by user. Closing environment...")
