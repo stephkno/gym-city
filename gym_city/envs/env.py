@@ -716,6 +716,9 @@ class MicropolisEnv(core.Env):
         
         Returns:
             str: Formatted ASCII grid with one character per tile
+        
+        Note: Shows only the agent's current view (MAP_X x MAP_Y tiles).
+        For larger views, use pan_map() to navigate and get different areas.
         '''
         # Tile character mapping
         tile_map = {
@@ -743,8 +746,8 @@ class MicropolisEnv(core.Env):
             'Net': 'n',
         }
         
+        # Show agent's view (MAP_X x MAP_Y)
         rows = []
-
         for y in range(self.MAP_Y):
             row = ''
             for x in range(self.MAP_X):
@@ -770,19 +773,6 @@ class MicropolisEnv(core.Env):
             result = stats + "\n" + result
         
         return result
-
-    def pan_map(self, x, y):
-        '''
-        Pans the navigation map view to center on the given tile coordinates.
-        
-        Args:
-            x: Tile X coordinate (0 to MAP_X-1)
-            y: Tile Y coordinate (0 to MAP_Y-1)
-        '''
-        nav_map = self.micro.win1.navigationMapView
-        if nav_map and hasattr(nav_map, 'panTo'):
-            # Pan to the center of the tile
-            nav_map.panTo(x * 16, y * 16)
 
     def describe_city(self, verbose=False):
         '''
