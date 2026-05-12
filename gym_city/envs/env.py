@@ -232,7 +232,7 @@ class MicropolisEnv(core.Env):
 #       num_static = max(0, max_static)
         self.micro.setFunds(self.micro.init_funds)
         if num_static > 0:
-            num_static = self.np_random.randint(0, num_static + 1)
+            num_static = self.np_random.integers(0, num_static + 1)
         for i in range(num_static):
             if i % 2 == 0:
                 static_build = True
@@ -241,7 +241,7 @@ class MicropolisEnv(core.Env):
             self.step(self.action_space.sample(), static_build=True)
 
     def randomStart(self):
-        r = self.np_random.randint(0, 100)
+        r = self.np_random.integers(0, 100)
         self.micro.setFunds(self.micro.init_funds)
         for i in range(r):
             self.step(self.action_space.sample())
